@@ -1,0 +1,11 @@
+2025-02-21T12:31:59|CRITICAL|root|Unhandled exception:Traceback (most recent call last):
+  File "C:\ProgramData\anaconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\measurement.py", line 27, in run
+    self.measurement._thread_run()
+  File "C:\ProgramData\anaconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\measurement.py", line 230, in _thread_run
+    self.run()
+  File "c:\data\python programs\camera humanitas\hyperspectralmicroscope\hyperspectral_measure.py", line 231, in run
+    if self.settings['measure']:
+  File "C:\ProgramData\anaconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\logged_quantity.py", line 1685, in __getitem__
+    return self._logged_quantities[key].val
+KeyError: 'measure'
+

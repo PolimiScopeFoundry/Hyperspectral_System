@@ -1,0 +1,13 @@
+2025-02-21T12:11:39|CRITICAL|root|Unhandled exception:Traceback (most recent call last):
+  File "C:\ProgramData\anaconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\measurement.py", line 27, in run
+    self.measurement._thread_run()
+  File "C:\ProgramData\anaconda3\envs\scopefoundry\lib\site-packages\ScopeFoundry\measurement.py", line 230, in _thread_run
+    self.run()
+  File "c:\data\python programs\camera humanitas\hyperspectralmicroscope\hyperspectral_measure.py", line 225, in run
+    [frame, dims] = self.image_gen.hamamatsu.getLastFrame()
+  File "c:\data\python programs\camera humanitas\hyperspectralmicroscope\Hamamatsu_ScopeFoundry\CameraDevice.py", line 1218, in getLastFrame
+    hc_data.copyData(paramlock.buf)
+  File "c:\data\python programs\camera humanitas\hyperspectralmicroscope\Hamamatsu_ScopeFoundry\CameraDevice.py", line 311, in copyData
+    ctypes.memmove(self.np_array.ctypes.data, address, self.size) #copies self.size bytes from address into self.np_array.ctyps.data
+OSError: exception: access violation reading 0x0000000000000000
+
