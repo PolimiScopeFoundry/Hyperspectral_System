@@ -1,0 +1,26 @@
+2021-06-21T16:41:34|CRITICAL|root|Unhandled exception:Traceback (most recent call last):
+  File "C:\Users\SPIM-OPT\anaconda3\envs\scopefoundry_py38\lib\site-packages\ScopeFoundry\logged_quantity.py", line 241, in update_value
+    self.hardware_set_func(self.val)
+  File "D:\LabPrograms\ScopeFoundry_POLIMI\PI_ScopeFoundry\PI_CG_device.py", line 44, in move_absolute
+    self.pi_device.MOV(self.axis, pos)
+  File "D:\LabPrograms\ScopeFoundry_POLIMI\PI_ScopeFoundry\PIPython\pipython\pidevice\gcs2\gcs2commands.py", line 2798, in MOV
+    self._msgs.send(cmdstr)
+  File "D:\LabPrograms\ScopeFoundry_POLIMI\PI_ScopeFoundry\PIPython\pipython\pidevice\gcsmessages.py", line 107, in send
+    self._checkerror(senderr=not self.embederr)
+  File "D:\LabPrograms\ScopeFoundry_POLIMI\PI_ScopeFoundry\PIPython\pipython\pidevice\gcsmessages.py", line 302, in _checkerror
+    raise exc  # Raising NoneType while only classes or instances are allowed pylint: disable=E0702
+PI_ScopeFoundry.PIPython.pipython.pidevice.gcserror.GCSError: Unallowable move attempted on unreferenced axis, or move attempted with servo off (5)
+
+2021-06-21T16:41:58|CRITICAL|root|Unhandled exception:Traceback (most recent call last):
+  File "C:\Users\SPIM-OPT\anaconda3\envs\scopefoundry_py38\lib\site-packages\ScopeFoundry\logged_quantity.py", line 241, in update_value
+    self.hardware_set_func(self.val)
+  File "D:\LabPrograms\ScopeFoundry_POLIMI\PI_ScopeFoundry\PI_CG_device.py", line 44, in move_absolute
+    self.pi_device.MOV(self.axis, pos)
+  File "D:\LabPrograms\ScopeFoundry_POLIMI\PI_ScopeFoundry\PIPython\pipython\pidevice\gcs2\gcs2commands.py", line 2798, in MOV
+    self._msgs.send(cmdstr)
+  File "D:\LabPrograms\ScopeFoundry_POLIMI\PI_ScopeFoundry\PIPython\pipython\pidevice\gcsmessages.py", line 107, in send
+    self._checkerror(senderr=not self.embederr)
+  File "D:\LabPrograms\ScopeFoundry_POLIMI\PI_ScopeFoundry\PIPython\pipython\pidevice\gcsmessages.py", line 302, in _checkerror
+    raise exc  # Raising NoneType while only classes or instances are allowed pylint: disable=E0702
+PI_ScopeFoundry.PIPython.pipython.pidevice.gcserror.GCSError: Unallowable move attempted on unreferenced axis, or move attempted with servo off (5)
+

@@ -1,0 +1,19 @@
+2021-06-21T15:56:49|CRITICAL|root|Unhandled exception:Traceback (most recent call last):
+  File "C:\Users\SPIM-OPT\anaconda3\envs\scopefoundry_py38\lib\site-packages\ScopeFoundry\hardware.py", line 219, in enable_connection
+    raise err
+  File "C:\Users\SPIM-OPT\anaconda3\envs\scopefoundry_py38\lib\site-packages\ScopeFoundry\hardware.py", line 212, in enable_connection
+    self.disconnect()
+  File "D:\LabPrograms\ScopeFoundry_POLIMI\PI_ScopeFoundry\PI_CG_hardware.py", line 47, in disconnect
+    self.motor.close()
+  File "D:\LabPrograms\ScopeFoundry_POLIMI\PI_ScopeFoundry\PI_CG_device.py", line 85, in close
+    self.stop()
+  File "D:\LabPrograms\ScopeFoundry_POLIMI\PI_ScopeFoundry\PI_CG_device.py", line 62, in stop
+    self.pi_device.HLT(self.axis)
+  File "D:\LabPrograms\ScopeFoundry_POLIMI\PI_ScopeFoundry\PIPython\pipython\pidevice\gcs2\gcs2commands.py", line 1058, in HLT
+    self._msgs.send(cmdstr)
+  File "D:\LabPrograms\ScopeFoundry_POLIMI\PI_ScopeFoundry\PIPython\pipython\pidevice\gcsmessages.py", line 107, in send
+    self._checkerror(senderr=not self.embederr)
+  File "D:\LabPrograms\ScopeFoundry_POLIMI\PI_ScopeFoundry\PIPython\pipython\pidevice\gcsmessages.py", line 302, in _checkerror
+    raise exc  # Raising NoneType while only classes or instances are allowed pylint: disable=E0702
+PI_ScopeFoundry.PIPython.pipython.pidevice.gcserror.GCSError: Controller was stopped by command (10)
+

@@ -1,0 +1,16 @@
+2021-06-21T16:27:41|CRITICAL|root|Unhandled exception:Traceback (most recent call last):
+  File "C:\Users\SPIM-OPT\anaconda3\envs\scopefoundry_py38\lib\site-packages\ScopeFoundry\hardware.py", line 208, in enable_connection
+    raise err
+  File "C:\Users\SPIM-OPT\anaconda3\envs\scopefoundry_py38\lib\site-packages\ScopeFoundry\hardware.py", line 204, in enable_connection
+    self.connect()
+  File "D:\LabPrograms\ScopeFoundry_POLIMI\PI_ScopeFoundry\PI_CG_hardware.py", line 49, in connect
+    self.read_from_hardware()
+  File "C:\Users\SPIM-OPT\anaconda3\envs\scopefoundry_py38\lib\site-packages\ScopeFoundry\hardware.py", line 181, in read_from_hardware
+    lq.read_from_hardware()
+  File "C:\Users\SPIM-OPT\anaconda3\envs\scopefoundry_py38\lib\site-packages\ScopeFoundry\logged_quantity.py", line 162, in read_from_hardware
+    self.update_value(new_val=val, update_hardware=False, send_signal=send_signal)
+  File "C:\Users\SPIM-OPT\anaconda3\envs\scopefoundry_py38\lib\site-packages\ScopeFoundry\logged_quantity.py", line 220, in update_value
+    new_val = self.sender().text()
+AttributeError: 'NoneType' object has no attribute 'text'
+
+2021-06-21T16:31:42|WARNING|root|no GCSTranslator path in Windows registry (HKLM\SOFTWARE\PI\GCSTranslator)
