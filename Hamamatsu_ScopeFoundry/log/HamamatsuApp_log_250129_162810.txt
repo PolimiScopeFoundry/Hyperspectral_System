@@ -1,0 +1,2 @@
+2025-01-29T16:29:25|INFO|HamamatsuApp|on_close
+2025-01-29T16:29:25|INFO|HamamatsuApp|disconnecting HamamatsuHardware
