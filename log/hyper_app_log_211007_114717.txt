@@ -1,0 +1,14 @@
+2021-10-07T12:06:41|CRITICAL|root|Unhandled exception:Traceback (most recent call last):
+  File "C:\Users\FastFMT-micro\anaconda3\lib\site-packages\ScopeFoundry\measurement.py", line 244, in start_stop
+    self._start()
+  File "C:\Users\FastFMT-micro\anaconda3\lib\site-packages\ScopeFoundry\measurement.py", line 134, in _start
+    raise RuntimeError("Cannot start a new measurement while still measuring")
+RuntimeError: Cannot start a new measurement while still measuring
+
+2021-10-07T16:07:28|CRITICAL|root|Unhandled exception:Traceback (most recent call last):
+  File "C:\Users\FastFMT-micro\anaconda3\lib\site-packages\ScopeFoundry\measurement.py", line 244, in start_stop
+    self._start()
+  File "C:\Users\FastFMT-micro\anaconda3\lib\site-packages\ScopeFoundry\measurement.py", line 134, in _start
+    raise RuntimeError("Cannot start a new measurement while still measuring")
+RuntimeError: Cannot start a new measurement while still measuring
+

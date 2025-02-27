@@ -1,0 +1,26 @@
+2021-10-05T18:33:31|CRITICAL|root|Unhandled exception:Traceback (most recent call last):
+  File "C:\Users\FastFMT-micro\anaconda3\lib\site-packages\ScopeFoundry\hardware.py", line 208, in enable_connection
+    raise err
+  File "C:\Users\FastFMT-micro\anaconda3\lib\site-packages\ScopeFoundry\hardware.py", line 204, in enable_connection
+    self.connect()
+  File "C:\LabPrograms\Python\QImaging_ScopeFoundry\camera_hw.py", line 35, in connect
+    self.camera = QImagingDevice(debug=self.debug_mode.val)
+  File "C:\LabPrograms\Python\QImaging_ScopeFoundry\camera_device.py", line 18, in __init__
+    self.cam = qi.OpenCamera(qi.ListCameras()[0])
+IndexError: list index out of range
+
+2021-10-05T18:33:35|CRITICAL|root|Unhandled exception:Traceback (most recent call last):
+  File "C:\Users\FastFMT-micro\anaconda3\lib\site-packages\ScopeFoundry\hardware.py", line 208, in enable_connection
+    raise err
+  File "C:\Users\FastFMT-micro\anaconda3\lib\site-packages\ScopeFoundry\hardware.py", line 204, in enable_connection
+    self.connect()
+  File "C:\LabPrograms\Python\QImaging_ScopeFoundry\camera_hw.py", line 35, in connect
+    self.camera = QImagingDevice(debug=self.debug_mode.val)
+  File "C:\LabPrograms\Python\QImaging_ScopeFoundry\camera_device.py", line 17, in __init__
+    qi.LoadDriver()
+  File "C:\LabPrograms\Python\QImaging_ScopeFoundry\qimaging_dll.py", line 1194, in LoadDriver
+    _check_error(_dll.QCam_LoadDriver())
+  File "C:\LabPrograms\Python\QImaging_ScopeFoundry\qimaging_dll.py", line 750, in _check_error
+    raise Error(errcode)
+QImaging_ScopeFoundry.qimaging_dll.Error: Too many calls to QCam.LoadDriver()
+
