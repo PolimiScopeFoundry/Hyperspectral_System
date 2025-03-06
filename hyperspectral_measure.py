@@ -26,6 +26,7 @@ class hyperMeasure(Measurement):
         self.ui = load_qt_ui_file(self.ui_filename) 
         
         self.settings.New('start_pos', dtype=float, unit='mm', initial=2.8463, spinbox_decimals=4) 
+        # NOTE: adapt the initial motor position to your stage! 
         self.settings.New('step', dtype=float, unit='um', initial=40, spinbox_decimals=2) 
         self.settings.New('step_num', dtype=int, initial=50, vmin = 1) 
         #self.add_operation('measure', self.measure)
@@ -34,6 +35,7 @@ class hyperMeasure(Measurement):
         self.settings.New('save_h5', dtype=bool, initial=False)         
         self.settings.New('refresh_period',dtype = float, unit ='s', spinbox_decimals = 3, initial = 0.05, vmin = 0)        
         
+        #dummy values for initialization; they are necessary for HDF5 files visualization in ImageJ 
         self.settings.New('xsampling', dtype=float, unit='um', initial=1.0) 
         self.settings.New('ysampling', dtype=float, unit='um', initial=1.0)
         self.settings.New('zsampling', dtype=float, unit='um', initial=1.0)
