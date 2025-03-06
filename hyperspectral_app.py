@@ -1,9 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-Created on wed Jun 16 01:33:32 2021
+Created on thur Mar 06 11:00:00 2025
 
-@authors: Andrea Bassi. Politecnico di Milano
+@authors: Antonio Composto, Martina Riva. Politecnico di Milano
 """
+
+#add for Visual Studio: this allows the code to run even with hardware folders outside the 
+#app folder
+import sys
+from os.path import dirname
+sys.path.append(dirname(dirname(__file__)))
+print('here:', dirname(dirname(__file__)))
+
+
 from ScopeFoundry import BaseMicroscopeApp
 
 class hyper_app(BaseMicroscopeApp):
@@ -14,9 +23,6 @@ class hyper_app(BaseMicroscopeApp):
         
         #Add hardware components
         print("Adding Hardware Components")
-        #modificato da Martina 13-02-2025
-        #from QImaging_ScopeFoundry.camera_hw import QImagingHW
-        #self.add_hardware(QImagingHW(self))
          
         from Hamamatsu_ScopeFoundry.CameraHardware import HamamatsuHardware
         self.add_hardware(HamamatsuHardware(self))
@@ -30,11 +36,9 @@ class hyper_app(BaseMicroscopeApp):
         from hyperspectral_measure import hyperMeasure
         self.add_measurement(hyperMeasure(self))
         
-        #from Hamamatsu_ScopeFoundry.CameraMeasurement import HamamatsuMeasurement
-        #self.add_measurement(HamamatsuMeasurement(self))
-
-        self.ui.show()
-        self.ui.activateWindow()
+        #For ScopeFoundry release 2.0.2 comment these lines:
+        #self.ui.show()
+        #self.ui.activateWindow()
 
 if __name__ == '__main__':
     
