@@ -2,7 +2,7 @@
 """
 Created on thur Mar 06 11:00:00 2025
 
-@authors: Antonio Composto, Martina Riva. Politecnico di Milano
+@authors: Andrea Bassi, Martina Riva, Antonio Composto. Politecnico di Milano
 """
 
 #add for Visual Studio: this allows the code to run even with hardware folders outside the 
@@ -43,11 +43,17 @@ class hyper_app(BaseMicroscopeApp):
 if __name__ == '__main__':
     
     import sys
-    
+    import os
+
     app = hyper_app(sys.argv)
-    #app.settings_load_ini(".\\Settings\\settings.ini")
+    
+    # Load settings from ini file in Settings, within the same folder as this script
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    setting_dir = os.path.join(current_dir, 'Settings', 'settings.ini')
+    app.settings_load_ini(setting_dir)
+
     for hc_name, hc in app.hardware.items():
-        hc.settings['connected'] = True    # connect all the hardwares  
+        hc.settings['connected'] = True    # connect all the hardwares  automatically
     
     
     sys.exit(app.exec_())
