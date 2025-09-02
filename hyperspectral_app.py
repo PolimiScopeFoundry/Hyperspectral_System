@@ -27,8 +27,8 @@ class hyper_app(BaseMicroscopeApp):
         from Hamamatsu_ScopeFoundry.CameraHardware import HamamatsuHardware
         self.add_hardware(HamamatsuHardware(self))
         
-        from PI_ScopeFoundry.PI_GCS_hardware import PI_GCS_HW
-        self.add_hardware(PI_GCS_HW(self))
+        from PI_ScopeFoundry.PI_CG_hardware import PI_CG_HW
+        self.add_hardware(PI_CG_HW(self))
 
         
         # Add measurement components

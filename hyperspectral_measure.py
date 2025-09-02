@@ -22,7 +22,7 @@ class hyperMeasure(Measurement):
         define settings, and set up data structures.
         """
         
-        self.ui_filename = sibling_path(__file__, "camera.ui")
+        self.ui_filename = sibling_path(__file__, "camera_with_plot.ui")
         self.ui = load_qt_ui_file(self.ui_filename) 
         
         self.settings.New('start_pos', dtype=float, unit='mm', initial=2.3, spinbox_decimals=4) 
@@ -43,10 +43,12 @@ class hyperMeasure(Measurement):
         self.settings.New('level_min', dtype=int, initial=60)
         self.settings.New('level_max', dtype=int, initial=4000)
         self.settings.New('save_h5', dtype=bool, initial=False)         
-        self.settings.New('refresh_period',dtype = float, unit ='s', spinbox_decimals = 3, initial = 0.05, vmin = 0)        
+        self.settings.New('refresh_period',dtype = float, unit ='s', spinbox_decimals = 3, initial = 0.05, vmin = 0) 
+        self.settings.New('posx', dtype=int, initial=800)       
+        self.settings.New('posy', dtype=int, initial=600)
 
         self.image_gen = self.app.hardware['HamamatsuHardware']
-        self.stage = self.app.hardware['PI_GCS_HW']
+        self.stage = self.app.hardware['PI_CG_HW']
         self.stage.settings['velocity'] = 5 
 
         
@@ -65,10 +67,15 @@ class hyperMeasure(Measurement):
         self.settings.auto_levels.connect_to_widget(self.ui.autoLevels_checkbox)
         self.auto_range.connect_to_widget(self.ui.autoRange_checkbox)
         self.settings.level_min.connect_to_widget(self.ui.min_doubleSpinBox) 
-        self.settings.level_max.connect_to_widget(self.ui.max_doubleSpinBox) 
+        self.settings.level_max.connect_to_widget(self.ui.max_doubleSpinBox)
+        self.settings.posx.connect_to_widget(self.ui.posX)
+        self.settings.posy.connect_to_widget(self.ui.posY)
+
+
                 
         # Set up pyqtgraph graph_layout in the UI
         self.imv = pg.ImageView()
+        self.plot_graph = pg.plot(title='Interferogram')
         self.ui.imageLayout.addWidget(self.imv)
         colors = [(0, 0, 0),
                   (45, 5, 61),
@@ -79,6 +86,10 @@ class hyperMeasure(Measurement):
                   ]
         cmap = pg.ColorMap(pos=np.linspace(0.0, 1.0, 6), color=colors)
         self.imv.setColorMap(cmap)
+        self.ui.plotLayout.addWidget(self.plot_graph)
+        self.time = []
+        self.intensity = []
+
         
         
     def update_display(self):
@@ -113,10 +124,22 @@ class hyperMeasure(Measurement):
             else:
                 self.imv.setLevels( min= self.settings['level_min'],
                                     max= self.settings['level_max'])
+                
+        if hasattr(self, 'plot'):
+            #self.plot_graph.setXRange(1, 10)
+            #self.plot_graph.setYRange(20, 40)
+            self.time = self.time[1:]
+            self.time.append(self.time[-1] + 1)
+            self.intensity = self.temperature[1:]
+            self.intensity.append(self.img[self.settings.posx.val, self.settings.posy.val])
+            self.plot_graph.setData(self.time,self.intensity)
             
             
     def measure(self):
-        
+
+
+        self.time = []
+        self.intensity = []
         self.image_gen.read_from_hardware()
         first_frame_acquired = False
         step_num  = self.settings.step_num.val # number of acquired frames equals the number of motor steps
@@ -215,6 +238,9 @@ class hyperMeasure(Measurement):
                    
         try:
             #start the camera
+            self.time = []
+            self.intensity = []
+        
             self.frame_index = -1
             self.eff_subarrayh = int(self.image_gen.subarrayh.val/self.image_gen.binning.val)
             self.eff_subarrayv = int(self.image_gen.subarrayv.val/self.image_gen.binning.val)
