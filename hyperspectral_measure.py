@@ -70,9 +70,7 @@ class hyperMeasure(Measurement):
         self.settings.level_max.connect_to_widget(self.ui.max_doubleSpinBox)
         self.settings.posx.connect_to_widget(self.ui.posX)
         self.settings.posy.connect_to_widget(self.ui.posY)
-
-
-                
+  
         # Set up pyqtgraph graph_layout in the UI
         self.imv = pg.ImageView()
         self.plot_graph = pg.plot(title='Interferogram')
@@ -125,19 +123,21 @@ class hyperMeasure(Measurement):
                 self.imv.setLevels( min= self.settings['level_min'],
                                     max= self.settings['level_max'])
                 
-        if hasattr(self, 'plot'):
             #self.plot_graph.setXRange(1, 10)
             #self.plot_graph.setYRange(20, 40)
-            self.time = self.time[1:]
-            self.time.append(self.time[-1] + 1)
-            self.intensity = self.temperature[1:]
-            self.intensity.append(self.img[self.settings.posx.val, self.settings.posy.val])
-            self.plot_graph.setData(self.time,self.intensity)
+            if self.settings['save_h5']:
+                self.time.append(self.frame_index)
+                self.intensity.append(self.img[self.settings.posx.val, self.settings.posy.val])
+                #print(self.time)
+                #print(self.intensity)
+                self.plot_graph.plot(self.time, self.intensity, pen='r')
+                #self.plot_graph.setData(np.array(self.time),np.array(self.intensity))
+                
             
             
     def measure(self):
 
-
+        self.plot_graph.clear()
         self.time = []
         self.intensity = []
         self.image_gen.read_from_hardware()
@@ -192,42 +192,43 @@ class hyperMeasure(Measurement):
         elif self.settings['camera_trigger'] == 'external':
                 self.image_gen.settings['trigger_source'] = 'external'
                 self.image_gen.settings['acquisition_mode'] = 'run_till_abort'
+                self.image_gen.settings['number_frames'] = step_num+10; #expected step_num but not always true, 10 arbitrary
+                #necessary to avoid warning about buffer
+                #step_num+1 because initial position is included
                 self.image_gen.read_from_hardware()
-                # self.image_gen.settings['number_frames'] = 2000
                 read_start_pos = self.stage.motor.get_position() #read the starting position
                 print('Scan starting position:', read_start_pos)
                 target_pos = starting_pos + step_num * step # final position
-                self.compute_motor_velocity() # set an appropriate velocity for the scan
-                print('Debugging: Motor velocity for continuous scan:', self.stage.motor.get_velocity(), 'mm/s')
+                self.set_motor_velocity() # set an appropriate velocity for the scan
+                print('Debugging: Motor velocity:', self.stage.motor.get_velocity(), 'mm/s')
 
                 #Acquisition with trigger
                 self.image_gen.hamamatsu.startAcquisition()
 
-                lastFrame_idx=0
-                start_time=time.time() #debugging 
+                start_time=time.time()
                 self.stage.motor.trigger(step, target_pos)
                 self.stage.motor.wait_on_target()
-                end_time = time.time() #debugging 
-                print('Debugging: Acquisition time:', end_time-start_time, 's')
+                end_time = time.time()
+                print('Acquisition time:', end_time-start_time, 's')
                 read_final_pos = self.stage.motor.get_position() #read the final position
                 print('Final position:', read_final_pos)
                 
                 self.image_gen.hamamatsu.stopAcquisitionNotReleasing() #stop acquisition without releasing the buffer
                 [frames, dims] = self.image_gen.hamamatsu.getFrames() 
-                print('Debugging: Number of frames acquired:', len(frames))
-
+                print('Number of acquired frames ',len(frames))
                 #Create the h5 file and save the data
                 if self.settings['save_h5']:
                     self.create_h5_file()
-                    for frame_idx in range(0,len(frames)):
-                        self.image_h5[frame_idx,:,:] = np.reshape(frames[frame_idx].getData(), (self.eff_subarrayv, self.eff_subarrayh))
+                    for frame_idx in range(0, len(frames)): #len(frames)=step_num+1: using this range I loos the last frame 
+                        self.np_data=frames[frame_idx].getData()
+                        self.image=np.reshape(self.np_data, (dims[0], dims[1]))
+                        self.image_h5[frame_idx,:,:] = self.image
+                        self.frame_index = frame_idx
                     self.positions_h5 = np.linspace(read_start_pos, read_final_pos, step_num)*1000 # convert to um
                     self.h5file.flush()
                 
-                #After the acquisition, reset the camera settings (trigger, motor velocity and position)
                 self.image_gen.settings['trigger_source'] = 'internal'
-                self.stage.settings['velocity'] = 5 #velocity for quick movement
-                self.stage.motor.go_home() #go back to the home position
+                self.stage.settings['velocity'] = 5
                 self.image_gen.read_from_hardware()
                 self.stage.read_from_hardware()
         else:
@@ -278,19 +279,26 @@ class hyperMeasure(Measurement):
                 
 
 
-    def compute_motor_velocity(self):
-        #compute an appropriate motor velocity for continuous scan according to step size and exposure time
-        # User can set the motor velocity manually
-        # self.stage.settings['velocity'] = self.settings['motor_velocity']
-        # self.stage.read_from_hardware()
+    # def compute_motor_velocity(self):
+    #     #compute an appropriate motor velocity for continuous scan according to step size and exposure time
+    #     # User can set the motor velocity manually
+    #     # self.stage.settings['velocity'] = self.settings['motor_velocity']
+    #     # self.stage.read_from_hardware()
 
-        if self.image_gen.settings['exposure_time']<0.010: #limitation due to camera maximum frame rate
-            frame_time=0.010      
-        else:
-            frame_time=self.image_gen.settings['exposure_time']
+    #     if self.image_gen.settings['exposure_time']<0.010: #limitation due to camera maximum frame rate
+    #         frame_time=0.010      
+    #     else:
+    #         frame_time=self.image_gen.settings['exposure_time']
 
-        self.stage.settings['velocity']=self.settings['step']*10**(-3)/(4*frame_time) # in mm/s
+    #     self.stage.settings['velocity']=self.settings['step']*10**(-3)/(4*frame_time) # in mm/s
+    #     self.stage.read_from_hardware()
+
+    def set_motor_velocity(self):
+        self.stage.settings['velocity'] = self.settings['motor_velocity']
         self.stage.read_from_hardware()
+        '''
+        
+        '''
 
                 
     def create_saving_directory(self):
@@ -317,17 +325,16 @@ class hyperMeasure(Measurement):
         img_size = self.img.shape
         dtype=self.img.dtype
         
-        length = self.settings.step_num.val
+        if self.settings['camera_trigger'] == 'internal':
+            length = self.settings.step_num.val
+        elif self.settings['camera_trigger'] == 'external': #with trigger there is a frame more acquired
+            length = self.settings.step_num.val+1
         
         self.image_h5 = self.h5_group.create_dataset(name  = 't0/c0/image', 
                                                   shape = [length, img_size[0], img_size[1]],
                                                   dtype = dtype)
         self.image_h5.attrs['element_size_um'] =  [self.settings['zsampling'],self.settings['ysampling'],self.settings['xsampling']]
         
-        self.image_h5.attrs['exposure_time_ms'] = self.image_gen.settings['exposure_time'].val
-
-        self.image_h5.attrs['ROI_hpos_vpos']=[self.image_gen.settings['subarrayh_pos'].val, self.image_gen.settings['subarrayv_pos'].val]
-
         self.positions_h5 = self.h5_group.create_dataset(name  = 't0/c0/position_mm', 
                                                   shape = [length],
                                                   dtype = np.float32)

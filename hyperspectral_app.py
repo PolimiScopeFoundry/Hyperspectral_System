@@ -28,7 +28,7 @@ class hyper_app(BaseMicroscopeApp):
         self.add_hardware(HamamatsuHardware(self))
         
         from PI_ScopeFoundry.PI_CG_hardware import PI_CG_HW
-        self.add_hardware(PI_CG_HW(self))
+        self.add_hardware(PI_CG_HW(self, serial='024550347'))
 
         
         # Add measurement components
@@ -48,9 +48,9 @@ if __name__ == '__main__':
     app = hyper_app(sys.argv)
     
     # Load settings from ini file in Settings, within the same folder as this script
-    #current_dir = os.path.dirname(os.path.abspath(__file__))
-    #setting_dir = os.path.join(current_dir, 'Settings', 'settings.ini')
-    #app.settings_load_ini(setting_dir)
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    setting_dir = os.path.join(current_dir, 'Settings', 'settings.ini')
+    app.settings_load_ini(setting_dir)
 
     for hc_name, hc in app.hardware.items():
         hc.settings['connected'] = True    # connect all the hardwares  automatically
