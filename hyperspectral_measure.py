@@ -224,7 +224,7 @@ class hyperMeasure(Measurement):
                         self.image=np.reshape(self.np_data, (dims[0], dims[1]))
                         self.image_h5[frame_idx,:,:] = self.image
                         self.frame_index = frame_idx
-                    self.positions_h5 = np.linspace(read_start_pos, read_final_pos, step_num)*1000 # convert to um
+                    self.positions_h5 = np.linspace(read_start_pos, read_final_pos, len(frames))*1000 # convert to um
                     self.h5file.flush()
                 
                 self.image_gen.settings['trigger_source'] = 'internal'
