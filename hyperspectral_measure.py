@@ -28,7 +28,7 @@ class hyperMeasure(Measurement):
         self.settings.New('start_pos', dtype=float, unit='mm', initial=2.3, spinbox_decimals=4) 
         self.settings.New('step', dtype=float, unit='um', initial=40, spinbox_decimals=2) 
         self.settings.New('step_num', dtype=int, initial=50, vmin = 1) 
-        self.settings.New('motor_velocity', dtype = float, initial=0.125, unit='mm/s')
+        self.settings.New('motor_velocity', dtype = float, initial=0.125, unit='mm/s', spinbox_decimals=2)
         #self.add_operation('measure', self.measure)
         self.settings.New('camera_trigger', dtype=str, ro=0, choices = ["internal", "external"], initial = 'internal')
     
