@@ -216,7 +216,7 @@ class hyperMeasure(Measurement):
                 self.image_gen.hamamatsu.stopAcquisitionNotReleasing() #stop acquisition without releasing the buffer
                 [frames, dims] = self.image_gen.hamamatsu.getFrames() 
                 print('Number of acquired frames ',len(frames))
-                self.step_num_eff=len(frames) #effective number of acquired frames is different from step_num (one more)
+                #self.step_num_eff=len(frames) #effective number of acquired frames is different from step_num (one more)
                 #Create the h5 file and save the data
                 if self.settings['save_h5']:
                     self.create_h5_file()
@@ -329,7 +329,7 @@ class hyperMeasure(Measurement):
         if self.settings['camera_trigger'] == 'internal':
             length = self.settings.step_num.val
         elif self.settings['camera_trigger'] == 'external': #with trigger there is a frame more acquired
-            length = self.step_num_eff
+            length = self.settings.step_num.val+1
         
         self.image_h5 = self.h5_group.create_dataset(name  = 't0/c0/image', 
                                                   shape = [length, img_size[0], img_size[1]],
