@@ -157,7 +157,7 @@ class hyperMeasure(Measurement):
         if self.settings['camera_trigger'] == 'internal':
             self.image_gen.settings['acquisition_mode'] = 'fixed_length'
             self.image_gen.settings['number_frames'] = 1
-        
+            self.stage.settings['velocity'] = 5
         
             for frame_idx in range(step_num):
             
@@ -175,7 +175,7 @@ class hyperMeasure(Measurement):
                         self.create_h5_file()
                         first_frame_acquired = True
                     self.image_h5[frame_idx,:,:] = self.img
-                    self.positions_h5[frame_idx] = current_pos
+                    self.positions_h5[frame_idx] = current_pos*1000 # convert to um
                     self.h5file.flush()
                 
                 if self.interrupt_measurement_called:
@@ -225,7 +225,9 @@ class hyperMeasure(Measurement):
                         self.image=np.reshape(self.np_data, (dims[0], dims[1]))
                         self.image_h5[frame_idx,:,:] = self.image
                         self.frame_index = frame_idx
-                    self.positions_h5 = np.linspace(read_start_pos, read_final_pos, len(frames))*1000 # convert to um
+                    vettore_posizioni = np.linspace(read_start_pos, read_final_pos, len(frames))*1000 # convert to um
+                    self.positions_h5[0:len(frames)] = vettore_posizioni
+                    print('positions_h5: ', self.positions_h5)
                     self.h5file.flush()
                 
                 self.image_gen.settings['trigger_source'] = 'internal'
