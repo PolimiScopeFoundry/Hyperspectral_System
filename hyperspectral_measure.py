@@ -85,6 +85,7 @@ class hyperMeasure(Measurement):
         cmap = pg.ColorMap(pos=np.linspace(0.0, 1.0, 6), color=colors)
         self.imv.setColorMap(cmap)
         self.ui.plotLayout.addWidget(self.plot_graph)
+        self.ui.tabWidget.setCurrentIndex(0) # show the image tab by default
         self.time = []
         self.intensity = []
 
@@ -206,30 +207,34 @@ class hyperMeasure(Measurement):
                 self.image_gen.hamamatsu.startAcquisition()
 
                 start_time=time.time()
+                print('Acquisition started')
                 self.stage.motor.trigger(step, target_pos)
                 self.stage.motor.wait_on_target()
                 end_time = time.time()
                 print('Acquisition time:', end_time-start_time, 's')
                 read_final_pos = self.stage.motor.get_position() #read the final position
                 print('Final position:', read_final_pos)
+
                 
                 self.image_gen.hamamatsu.stopAcquisitionNotReleasing() #stop acquisition without releasing the buffer
                 [frames, dims] = self.image_gen.hamamatsu.getFrames() 
                 print('Number of acquired frames ',len(frames))
+                vettore_posizioni = np.linspace(read_start_pos, read_final_pos, len(frames))*1000 # convert to um
                 #self.step_num_eff=len(frames) #effective number of acquired frames is different from step_num (one more)
                 #Create the h5 file and save the data
                 if self.settings['save_h5']:
                     self.create_h5_file()
                     for frame_idx in range(0, len(frames)): #len(frames)=step_num+1: using this range I loos the last frame 
                         self.np_data=frames[frame_idx].getData()
-                        self.image=np.reshape(self.np_data, (dims[0], dims[1]))
+                        self.image=np.reshape(self.np_data, (dims[1], dims[0]))
                         self.image_h5[frame_idx,:,:] = self.image
                         self.frame_index = frame_idx
-                    vettore_posizioni = np.linspace(read_start_pos, read_final_pos, len(frames))*1000 # convert to um
-                    self.positions_h5[0:len(frames)] = vettore_posizioni
-                    print('positions_h5: ', self.positions_h5)
+
+                        self.positions_h5[frame_idx] = vettore_posizioni[frame_idx]
+                
                     self.h5file.flush()
                 
+                self.stage.motor.pi_device.TRO(1,0) #disable the trigger output- use gebneric axis!!!!
                 self.image_gen.settings['trigger_source'] = 'internal'
                 self.stage.settings['velocity'] = 5
                 self.image_gen.read_from_hardware()
