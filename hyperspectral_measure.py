@@ -28,7 +28,7 @@ class hyperMeasure(Measurement):
         self.settings.New('start_pos', dtype=float, unit='mm', initial=2.3, spinbox_decimals=4) 
         self.settings.New('step', dtype=float, unit='um', initial=40, spinbox_decimals=2) 
         self.settings.New('step_num', dtype=int, initial=50, vmin = 1) 
-        self.settings.New('motor_velocity', dtype = float, initial=0.125, unit='mm/s', spinbox_decimals=2)
+        self.settings.New('motor_velocity', dtype = float, initial=0.125, unit='mm/s', spinbox_decimals=3)
         #self.add_operation('measure', self.measure)
         self.settings.New('camera_trigger', dtype=str, ro=0, choices = ["internal", "external"], initial = 'internal')
     
@@ -158,7 +158,7 @@ class hyperMeasure(Measurement):
         if self.settings['camera_trigger'] == 'internal':
             self.image_gen.settings['acquisition_mode'] = 'fixed_length'
             self.image_gen.settings['number_frames'] = 1
-            self.stage.settings['velocity'] = 5
+            self.stage.settings['velocity'] = 5 #high velocity for fast movement
         
             for frame_idx in range(step_num):
             
@@ -209,6 +209,13 @@ class hyperMeasure(Measurement):
                 start_time=time.time()
                 print('Acquisition started')
                 self.stage.motor.trigger(step, target_pos)
+                #Wait until the motor reaches the target position or the measurement is interrupted
+                while not self.interrupt_measurement_called and (self.stage.motor.get_position() < target_pos):
+                    self.update_display()
+                    print('Debugging: position:', self.stage.motor.get_position())
+                    time.sleep(self.display_update_period)
+
+
                 self.stage.motor.wait_on_target()
                 end_time = time.time()
                 print('Acquisition time:', end_time-start_time, 's')
@@ -224,7 +231,7 @@ class hyperMeasure(Measurement):
                 #Create the h5 file and save the data
                 if self.settings['save_h5']:
                     self.create_h5_file()
-                    for frame_idx in range(0, len(frames)): #len(frames)=step_num+1: using this range I loos the last frame 
+                    for frame_idx in range(0, step_num+1): #len(frames)=step_num+1: using this range I loos the last frame 
                         self.np_data=frames[frame_idx].getData()
                         self.image=np.reshape(self.np_data, (dims[1], dims[0]))
                         self.image_h5[frame_idx,:,:] = self.image
@@ -236,7 +243,7 @@ class hyperMeasure(Measurement):
                 
                 self.stage.motor.pi_device.TRO(1,0) #disable the trigger output- use gebneric axis!!!!
                 self.image_gen.settings['trigger_source'] = 'internal'
-                self.stage.settings['velocity'] = 5
+                self.stage.settings['velocity'] = 5 #high velocity for fast movement 
                 self.image_gen.read_from_hardware()
                 self.stage.read_from_hardware()
         else:
@@ -287,26 +294,21 @@ class hyperMeasure(Measurement):
                 
 
 
-    # def compute_motor_velocity(self):
-    #     #compute an appropriate motor velocity for continuous scan according to step size and exposure time
-    #     # User can set the motor velocity manually
-    #     # self.stage.settings['velocity'] = self.settings['motor_velocity']
-    #     # self.stage.read_from_hardware()
-
-    #     if self.image_gen.settings['exposure_time']<0.010: #limitation due to camera maximum frame rate
-    #         frame_time=0.010      
-    #     else:
-    #         frame_time=self.image_gen.settings['exposure_time']
-
-    #     self.stage.settings['velocity']=self.settings['step']*10**(-3)/(4*frame_time) # in mm/s
-    #     self.stage.read_from_hardware()
-
     def set_motor_velocity(self):
-        self.stage.settings['velocity'] = self.settings['motor_velocity']
+        # User can set the motor velocity manually
+        # self.stage.settings['velocity'] = self.settings['motor_velocity'] #user defined velocity
+        # self.stage.read_from_hardware()
+
+
+        if self.image_gen.settings['exposure_time']<0.010: #limitation due to camera maximum frame rate
+            frame_time=0.010      
+        else:
+            frame_time=self.image_gen.settings['exposure_time']
+
+        self.stage.settings['velocity']=self.settings['step']*10**(-3)/(4*frame_time) # in mm/s
         self.stage.read_from_hardware()
-        '''
-        
-        '''
+
+
 
                 
     def create_saving_directory(self):
