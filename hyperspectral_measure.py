@@ -232,12 +232,15 @@ class hyperMeasure(Measurement):
                 if self.settings['save_h5']:
                     self.create_h5_file()
                     for frame_idx in range(0, step_num+1): #len(frames)=step_num+1: using this range I loos the last frame 
-                        self.np_data=frames[frame_idx].getData()
-                        self.image=np.reshape(self.np_data, (dims[1], dims[0]))
-                        self.image_h5[frame_idx,:,:] = self.image
-                        self.frame_index = frame_idx
+                        try:
+                            self.np_data=frames[frame_idx].getData()
+                            self.image=np.reshape(self.np_data, (dims[1], dims[0]))
+                            self.image_h5[frame_idx,:,:] = self.image
+                            self.frame_index = frame_idx
 
-                        self.positions_h5[frame_idx] = vettore_posizioni[frame_idx]
+                            self.positions_h5[frame_idx] = vettore_posizioni[frame_idx]
+                        except IndexError:
+                            print('IndexError: the number of acquired frames is lower than expected')
                 
                     self.h5file.flush()
                 
@@ -295,19 +298,26 @@ class hyperMeasure(Measurement):
 
 
     def set_motor_velocity(self):
+        # %Version 1: user sets the motor velocity manually
         # User can set the motor velocity manually
         # self.stage.settings['velocity'] = self.settings['motor_velocity'] #user defined velocity
         # self.stage.read_from_hardware()
 
 
-        if self.image_gen.settings['exposure_time']<0.010: #limitation due to camera maximum frame rate
-            frame_time=0.010      
-        else:
-            frame_time=self.image_gen.settings['exposure_time']
 
-        self.stage.settings['velocity']=self.settings['step']*10**(-3)/(4*frame_time) # in mm/s
-        self.stage.read_from_hardware()
+        # %Version 2: automatic calculation of the motor velocity with an emmpirical threshold        
+        # if self.image_gen.settings['exposure_time']<0.010: #limitation due to camera maximum frame rate
+        #     frame_time=0.010      
+        # else:
+        #     frame_time=self.image_gen.settings['exposure_time']
 
+        # self.stage.settings['velocity']=self.settings['step']*10**(-3)/(4*frame_time) # in mm/s
+        # self.stage.read_from_hardware()
+
+
+
+        # %Version 3: automatic calculation of the motor velocity with maximum frame rate internal_frame_rate
+        # % (Be careful: it does not consider the ROI)
         # frame_time=self.image_gen.settings['exposure_time']
 
         # if 1/(4*frame_time) < self.image_gen.settings['internal_frame_rate']:
@@ -316,27 +326,28 @@ class hyperMeasure(Measurement):
         # self.stage.settings['velocity']=self.settings['step']*10**(-3)/(4*frame_time) # in mm/s
         # self.stage.read_from_hardware()
 
-    '''
 
-        # maximum frame rate calculation according to Hamamatsu manual 
-        # https://www.hamamatsu.com/eu/en/product/cameras/cmos-cameras/C11440-42U40.html
+    
+        # %Version 4: automatic calculation of the motor velocity with maximum frame rate according to Hamamatsu manual
+        # %https://www.hamamatsu.com/eu/en/product/cameras/cmos-cameras/C11440-42U40.html
 
         V = self.image_gen.subarrayv.val # number of effective vertcal lines (number of horizontal does not contribute)
-        H = 32.4812*10^(-6) 
+        H = 32.4812*10**(-6) 
         Exp = self.image_gen.settings['exposure_time'] # in s
         frame_rate = 1/(V/2*H+Exp+10*H) # maximum frame rate for external trigger
+        print('Debugging: Maximum frame rate for ROI (',self.image_gen.subarrayv.val, self.image_gen.subarrayh.val, ') and acquisition time', Exp, 'is',  frame_rate, 'Hz')
 
         self.stage.settings['velocity']=self.settings['step']*10**(-3)/(4*Exp) # in mm/s
+        print('Debugging: Chosen motor velocity:', self.stage.settings['velocity'], 'mm/s')
+        print('Debugging: required frame rate:', 1/(self.settings['step']*10**(-3)/self.stage.settings['velocity']), 'Hz')
 
-        if 1/(self.settings['step']*10**(-3)/self.stage.settings['velocity']) < frame_rate:
+        if 1/(self.settings['step']*10**(-3)/self.stage.settings['velocity']) > 0.85*frame_rate: # empirical threshold 
             print('Warning: the selected motor velocity is too high for the current camera settings')
             print('Maximum motor velocity for current camera settings is ', self.settings['step']*10**(-3)*frame_rate, 'mm/s')
-            self.stage.settings['velocity'] = self.settings['step']*10**(-3)*frame_rate
+            self.stage.settings['velocity'] = 0.75*self.settings['step']*10**(-3)*frame_rate #empirical threshold
             
         self.stage.read_from_hardware()
-    '''
-
-
+    
 
                 
     def create_saving_directory(self):
