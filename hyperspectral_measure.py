@@ -308,6 +308,34 @@ class hyperMeasure(Measurement):
         self.stage.settings['velocity']=self.settings['step']*10**(-3)/(4*frame_time) # in mm/s
         self.stage.read_from_hardware()
 
+        # frame_time=self.image_gen.settings['exposure_time']
+
+        # if 1/(4*frame_time) < self.image_gen.settings['internal_frame_rate']:
+        #     print('Chosen velocity is too high! The acquisition can not follow the motor movement')
+
+        # self.stage.settings['velocity']=self.settings['step']*10**(-3)/(4*frame_time) # in mm/s
+        # self.stage.read_from_hardware()
+
+    '''
+
+        # maximum frame rate calculation according to Hamamatsu manual 
+        # https://www.hamamatsu.com/eu/en/product/cameras/cmos-cameras/C11440-42U40.html
+
+        V = self.image_gen.subarrayv.val # number of effective vertcal lines (number of horizontal does not contribute)
+        H = 32.4812*10^(-6) 
+        Exp = self.image_gen.settings['exposure_time'] # in s
+        frame_rate = 1/(V/2*H+Exp+10*H) # maximum frame rate for external trigger
+
+        self.stage.settings['velocity']=self.settings['step']*10**(-3)/(4*Exp) # in mm/s
+
+        if 1/(self.settings['step']*10**(-3)/self.stage.settings['velocity']) < frame_rate:
+            print('Warning: the selected motor velocity is too high for the current camera settings')
+            print('Maximum motor velocity for current camera settings is ', self.settings['step']*10**(-3)*frame_rate, 'mm/s')
+            self.stage.settings['velocity'] = self.settings['step']*10**(-3)*frame_rate
+            
+        self.stage.read_from_hardware()
+    '''
+
 
 
                 
