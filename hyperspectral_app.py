@@ -30,7 +30,7 @@ class hyper_app(BaseMicroscopeApp):
         
         add_path('PI_ScopeFoundry')
         from PI_hardware import PI_HW
-        self.add_hardware(PI_HW(self, serial='0185500006'))
+        self.add_hardware(PI_HW(self, serial='0185500006', encoder='VC'))
 
         
         # Add measurement components
