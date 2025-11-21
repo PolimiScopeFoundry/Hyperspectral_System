@@ -29,8 +29,8 @@ class hyper_app(BaseMicroscopeApp):
         self.add_hardware(HamamatsuHardware(self))
         
         add_path('PI_ScopeFoundry')
-        from PI_CG_hardware import PI_CG_HW
-        self.add_hardware(PI_CG_HW(self, serial='024550347'))
+        from PI_hardware import PI_HW
+        self.add_hardware(PI_HW(self, serial='0185500006'))
 
         
         # Add measurement components

@@ -48,7 +48,7 @@ class hyperMeasure(Measurement):
         self.settings.New('posy', dtype=int, initial=600)
 
         self.image_gen = self.app.hardware['HamamatsuHardware']
-        self.stage = self.app.hardware['PI_CG_HW']
+        self.stage = self.app.hardware['PI_HW']
         self.stage.settings['velocity'] = 5 
 
         
